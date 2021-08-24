@@ -21,48 +21,36 @@ src = 0, dst = 2, k = 1
 using namespace std;
 class Solution {
 public:
-    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
-        vector<vector<int>>map (n, vector<int>(n,-1));
-        for(auto item: flights)
-        {
-            int _src= item[0];
-            int _dst= item[1];
-            int cost = item[2];
-            map[_src][_dst] = cost;
+    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int K) {
+        //dp[i][k]表示从src至多经过k站到达i的最少费用
+        vector<vector<int>> dp(n, vector<int>(K + 2, INT_MAX));
+        //初始化 src 到 src的费用为0
+        for (int k = 0; k <= K + 1; ++k){
+            dp[src][k] = 0;
         }
-        // for(int i = n-2;i>=0;i--)
-        // {
-        //     for(int j=n-1;j>i;j--)
-        //     {
-        //         if(map[i+1][j]!=0&&map[i][j-1]!=0)
-        //         {
-        //             map[i][j] = min(map[i][j], map[i+1][j]+map[i][j-1]);
-        //         }
-        //     }
-        // }
-        return mincost(map,k,src,dst);
-       
-    }
-    int mincost(vector<vector<int>>map,int k,int _src, int _dst)
-    {
-        int cost = map[_src][_dst];
-        if(k>0)
-        {
-            for(int i=_src+1;i<_dst;i++)
-            {
-                cost = min(map[_src][i]+mincost(map,k-1,i,_dst),cost);
+        //开始动态规划
+        for (int k = 1; k <= K + 1; ++k){
+            for (auto &flight : flights){
+                //如果从src至多经过k - 1站可达flight[0]
+                if (dp[flight[0]][k - 1] != INT_MAX){
+                    //更新从src至多经过k站到达flight[1]
+                    dp[flight[1]][k] = min(dp[flight[1]][k], dp[flight[0]][k - 1] + flight[2]);
+                }
             }
         }
-        return cost;
+        return dp[dst][K+1] == INT_MAX ? -1 : dp[dst][K+1];
     }
 };
-
 int main()
 {
-    int n = 3;
-    vector<vector<int>>map = {vector<int>{0,1,100},vector<int>{1,2,100},vector<int>{0,2,500}};
+    int n = 5;
+    //5 [[1,2,10],[2,0,7],[1,3,8],[4,0,10],[3,4,2],[4,2,10],[0,3,3],[3,1,6],[2,4,5]]
+    vector<vector<int>>map = {vector<int>{1,2,10},vector<int>{2,0,7},vector<int>{1,3,8},
+    vector<int>{4,0,10},vector<int>{3,4,2},vector<int>{4,2,10},vector<int>{0,3,3},
+    vector<int>{3,1,6},vector<int>{2,4,5}
+    };
     int src = 0;
-    int dst = 2;
+    int dst = 4;
     int k=1;
     Solution so;
     cout<<so.findCheapestPrice(n,map,src,dst,k);
