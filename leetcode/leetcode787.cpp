@@ -22,7 +22,7 @@ using namespace std;
 class Solution {
 public:
     int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
-        vector<vector<int>>map (n, vector<int>(n,0));
+        vector<vector<int>>map (n, vector<int>(n,-1));
         for(auto item: flights)
         {
             int _src= item[0];
